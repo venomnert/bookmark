@@ -63,4 +63,67 @@ defmodule Bookmark.CoreTest do
       assert %Ecto.Changeset{} = Core.change_bookmarks(bookmarks)
     end
   end
+
+  describe "contexts" do
+    alias Bookmark.Core.Context
+
+    @valid_attrs %{picture: "some picture", text: "some text", video: "some video"}
+    @update_attrs %{picture: "some updated picture", text: "some updated text", video: "some updated video"}
+    @invalid_attrs %{picture: nil, text: nil, video: nil}
+
+    def context_fixture(attrs \\ %{}) do
+      {:ok, context} =
+        attrs
+        |> Enum.into(@valid_attrs)
+        |> Core.create_context()
+
+      context
+    end
+
+    test "list_contexts/0 returns all contexts" do
+      context = context_fixture()
+      assert Core.list_contexts() == [context]
+    end
+
+    test "get_context!/1 returns the context with given id" do
+      context = context_fixture()
+      assert Core.get_context!(context.id) == context
+    end
+
+    test "create_context/1 with valid data creates a context" do
+      assert {:ok, %Context{} = context} = Core.create_context(@valid_attrs)
+      assert context.picture == "some picture"
+      assert context.text == "some text"
+      assert context.video == "some video"
+    end
+
+    test "create_context/1 with invalid data returns error changeset" do
+      assert {:error, %Ecto.Changeset{}} = Core.create_context(@invalid_attrs)
+    end
+
+    test "update_context/2 with valid data updates the context" do
+      context = context_fixture()
+      assert {:ok, %Context{} = context} = Core.update_context(context, @update_attrs)
+      assert context.picture == "some updated picture"
+      assert context.text == "some updated text"
+      assert context.video == "some updated video"
+    end
+
+    test "update_context/2 with invalid data returns error changeset" do
+      context = context_fixture()
+      assert {:error, %Ecto.Changeset{}} = Core.update_context(context, @invalid_attrs)
+      assert context == Core.get_context!(context.id)
+    end
+
+    test "delete_context/1 deletes the context" do
+      context = context_fixture()
+      assert {:ok, %Context{}} = Core.delete_context(context)
+      assert_raise Ecto.NoResultsError, fn -> Core.get_context!(context.id) end
+    end
+
+    test "change_context/1 returns a context changeset" do
+      context = context_fixture()
+      assert %Ecto.Changeset{} = Core.change_context(context)
+    end
+  end
 end

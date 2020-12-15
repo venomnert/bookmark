@@ -73,6 +73,17 @@ defmodule BookmarkWeb.Router do
   end
 
   scope "/", BookmarkWeb do
+    pipe_through [:browser, :require_authenticated_user]
+    
+    live "/contexts", ContextLive.Index, :index
+    live "/contexts/new", ContextLive.Index, :new
+    live "/contexts/:id/edit", ContextLive.Index, :edit
+
+    live "/contexts/:id", ContextLive.Show, :show
+    live "/contexts/:id/show/edit", ContextLive.Show, :edit
+  end
+
+  scope "/", BookmarkWeb do
     pipe_through [:browser]
 
     delete "/users/log_out", UserSessionController, :delete
