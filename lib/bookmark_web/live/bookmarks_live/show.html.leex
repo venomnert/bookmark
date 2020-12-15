@@ -1,0 +1,27 @@
+<h1>Show Bookmarks</h1>
+
+<%= if @live_action in [:edit] do %>
+  <%= live_modal @socket, BookmarkWeb.BookmarksLive.FormComponent,
+    id: @bookmarks.id,
+    title: @page_title,
+    action: @live_action,
+    bookmarks: @bookmarks,
+    return_to: Routes.bookmarks_show_path(@socket, :show, @bookmarks) %>
+<% end %>
+
+<ul>
+
+  <li>
+    <strong>Name:</strong>
+    <%= @bookmarks.name %>
+  </li>
+
+  <li>
+    <strong>Url:</strong>
+    <%= @bookmarks.url %>
+  </li>
+
+</ul>
+
+<span><%= live_patch "Edit", to: Routes.bookmarks_show_path(@socket, :edit, @bookmarks), class: "button" %></span>
+<span><%= live_redirect "Back", to: Routes.bookmarks_index_path(@socket, :index) %></span>

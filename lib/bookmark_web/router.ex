@@ -23,11 +23,6 @@ defmodule BookmarkWeb.Router do
     live "/", PageLive, :index
   end
 
-  # Other scopes may use custom stacks.
-  # scope "/api", BookmarkWeb do
-  #   pipe_through :api
-  # end
-
   # Enables LiveDashboard only for development
   #
   # If you want to use the LiveDashboard in production, you should put
@@ -65,6 +60,16 @@ defmodule BookmarkWeb.Router do
     get "/users/settings", UserSettingsController, :edit
     put "/users/settings", UserSettingsController, :update
     get "/users/settings/confirm_email/:token", UserSettingsController, :confirm_email
+  end
+
+  scope "/", BookmarkWeb do
+    pipe_through [:browser, :require_authenticated_user]
+
+    live "/bookmark", BookmarksLive.Index, :index
+    live "/bookmark/new", BookmarksLive.New, :new
+    live "/bookmark/:id/edit", BookmarksLive.Edit, :edit
+    live "/bookmark/:id", BookmarksLive.Show, :show
+    live "/bookmark/:id/show/edit", BookmarksLive.Show, :edit
   end
 
   scope "/", BookmarkWeb do
