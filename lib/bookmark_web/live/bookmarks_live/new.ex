@@ -2,11 +2,15 @@ defmodule BookmarkWeb.BookmarksLive.New do
   use BookmarkWeb, :live_view
 
   alias Bookmark.Core
-  alias Bookmark.Core.Bookmarks
+  alias Bookmark.Core.{Bookmarks, Contexts}
 
   @impl true
   def mount(_params, _session, socket) do
-    {:ok, assign(socket, :bookmark, list_bookmark())}
+    updated_socket = socket
+                    |> assign(:bookmark, list_bookmark())
+                    |> assign(:context, list_contexts())
+
+    {:ok, updated_socket}
   end
 
   @impl true
@@ -18,12 +22,15 @@ defmodule BookmarkWeb.BookmarksLive.New do
     socket
     |> assign(:page_title, "Edit Bookmarks")
     |> assign(:bookmarks, Core.get_bookmarks!(id))
+    |> assign(:page_title, "Edit Contexts")
+    |> assign(:contexts, Core.get_context!(id))
   end
 
   defp apply_action(socket, :new, _params) do
     socket
     |> assign(:page_title, "New Bookmarks")
     |> assign(:bookmarks, %Bookmarks{})
+    |> assign(:contexts, %Contexts{})
   end
 
   @impl true
@@ -31,10 +38,20 @@ defmodule BookmarkWeb.BookmarksLive.New do
     bookmarks = Core.get_bookmarks!(id)
     {:ok, _} = Core.delete_bookmarks(bookmarks)
 
-    {:noreply, assign(socket, :bookmark, list_bookmark())}
+    context = Core.get_context!(id)
+    {:ok, _} = Core.delete_context(context)
+
+    updated_socket = socket
+                      |> assign(:bookmark, list_bookmark())
+                      |> assign(:contexts, list_contexts())
+
+    {:noreply, updated_socket}
   end
 
   defp list_bookmark do
     Core.list_bookmark()
+  end
+  defp list_contexts do
+    Core.list_contexts()
   end
 end

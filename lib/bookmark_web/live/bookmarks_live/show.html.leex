@@ -1,7 +1,7 @@
 <h1>Show Bookmarks</h1>
 
 <%= if @live_action in [:edit] do %>
-  <%= live_modal @socket, BookmarkWeb.BookmarksLive.FormComponent,
+  <%= live_modal_bookmark @socket, BookmarkWeb.BookmarksLive.FormComponent,
     id: @bookmarks.id,
     title: @page_title,
     action: @live_action,

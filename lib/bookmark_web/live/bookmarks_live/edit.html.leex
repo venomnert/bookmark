@@ -3,7 +3,7 @@
   <%= live_patch "New Bookmarks", to: Routes.bookmarks_new_path(@socket, :new), class: "bg-blue-500 font-bold hover:bg-blue-700 px-4 py-2 rounded text-white" %>
 </div>
 
-<%= live_modal @socket, BookmarkWeb.BookmarksLive.FormComponent,
+<%= live_modal_bookmark @socket, BookmarkWeb.BookmarksLive.FormComponent,
   id: @bookmarks.id || :new,
   title: @page_title,
   action: @live_action,

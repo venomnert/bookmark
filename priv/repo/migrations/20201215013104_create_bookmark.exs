@@ -2,7 +2,7 @@ defmodule Bookmark.Repo.Migrations.CreateBookmark do
   use Ecto.Migration
 
   def change do
-    create table(:bookmark) do
+    create table(:bookmarks) do
       add :name, :string
       add :url, :string
 
