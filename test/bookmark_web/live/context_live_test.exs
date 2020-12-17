@@ -1,4 +1,4 @@
-defmodule BookmarkWeb.ContextLiveTest do
+defmodule BookmarkWeb.ContextsLiveTest do
   use BookmarkWeb.ConnCase
 
   import Phoenix.LiveViewTest
@@ -23,19 +23,19 @@ defmodule BookmarkWeb.ContextLiveTest do
     setup [:create_context]
 
     test "lists all contexts", %{conn: conn, context: context} do
-      {:ok, _index_live, html} = live(conn, Routes.context_index_path(conn, :index))
+      {:ok, _index_live, html} = live(conn, Routes.contexts_index_path(conn, :index))
 
-      assert html =~ "Listing Contexts"
+      assert html =~ "Listing Contextss"
       assert html =~ context.picture
     end
 
     test "saves new context", %{conn: conn} do
-      {:ok, index_live, _html} = live(conn, Routes.context_index_path(conn, :index))
+      {:ok, index_live, _html} = live(conn, Routes.contexts_index_path(conn, :index))
 
-      assert index_live |> element("a", "New Context") |> render_click() =~
-               "New Context"
+      assert index_live |> element("a", "New Contexts") |> render_click() =~
+               "New Contexts"
 
-      assert_patch(index_live, Routes.context_index_path(conn, :new))
+      assert_patch(index_live, Routes.contexts_index_path(conn, :new))
 
       assert index_live
              |> form("#context-form", context: @invalid_attrs)
@@ -45,19 +45,19 @@ defmodule BookmarkWeb.ContextLiveTest do
         index_live
         |> form("#context-form", context: @create_attrs)
         |> render_submit()
-        |> follow_redirect(conn, Routes.context_index_path(conn, :index))
+        |> follow_redirect(conn, Routes.contexts_index_path(conn, :index))
 
-      assert html =~ "Context created successfully"
+      assert html =~ "Contexts created successfully"
       assert html =~ "some picture"
     end
 
     test "updates context in listing", %{conn: conn, context: context} do
-      {:ok, index_live, _html} = live(conn, Routes.context_index_path(conn, :index))
+      {:ok, index_live, _html} = live(conn, Routes.contexts_index_path(conn, :index))
 
       assert index_live |> element("#context-#{context.id} a", "Edit") |> render_click() =~
-               "Edit Context"
+               "Edit Contexts"
 
-      assert_patch(index_live, Routes.context_index_path(conn, :edit, context))
+      assert_patch(index_live, Routes.contexts_index_path(conn, :edit, context))
 
       assert index_live
              |> form("#context-form", context: @invalid_attrs)
@@ -67,14 +67,14 @@ defmodule BookmarkWeb.ContextLiveTest do
         index_live
         |> form("#context-form", context: @update_attrs)
         |> render_submit()
-        |> follow_redirect(conn, Routes.context_index_path(conn, :index))
+        |> follow_redirect(conn, Routes.contexts_index_path(conn, :index))
 
-      assert html =~ "Context updated successfully"
+      assert html =~ "Contexts updated successfully"
       assert html =~ "some updated picture"
     end
 
     test "deletes context in listing", %{conn: conn, context: context} do
-      {:ok, index_live, _html} = live(conn, Routes.context_index_path(conn, :index))
+      {:ok, index_live, _html} = live(conn, Routes.contexts_index_path(conn, :index))
 
       assert index_live |> element("#context-#{context.id} a", "Delete") |> render_click()
       refute has_element?(index_live, "#context-#{context.id}")
@@ -85,19 +85,19 @@ defmodule BookmarkWeb.ContextLiveTest do
     setup [:create_context]
 
     test "displays context", %{conn: conn, context: context} do
-      {:ok, _show_live, html} = live(conn, Routes.context_show_path(conn, :show, context))
+      {:ok, _show_live, html} = live(conn, Routes.contexts_show_path(conn, :show, context))
 
-      assert html =~ "Show Context"
+      assert html =~ "Show Contexts"
       assert html =~ context.picture
     end
 
     test "updates context within modal", %{conn: conn, context: context} do
-      {:ok, show_live, _html} = live(conn, Routes.context_show_path(conn, :show, context))
+      {:ok, show_live, _html} = live(conn, Routes.contexts_show_path(conn, :show, context))
 
       assert show_live |> element("a", "Edit") |> render_click() =~
-               "Edit Context"
+               "Edit Contexts"
 
-      assert_patch(show_live, Routes.context_show_path(conn, :edit, context))
+      assert_patch(show_live, Routes.contexts_show_path(conn, :edit, context))
 
       assert show_live
              |> form("#context-form", context: @invalid_attrs)
@@ -107,9 +107,9 @@ defmodule BookmarkWeb.ContextLiveTest do
         show_live
         |> form("#context-form", context: @update_attrs)
         |> render_submit()
-        |> follow_redirect(conn, Routes.context_show_path(conn, :show, context))
+        |> follow_redirect(conn, Routes.contexts_show_path(conn, :show, context))
 
-      assert html =~ "Context updated successfully"
+      assert html =~ "Contexts updated successfully"
       assert html =~ "some updated picture"
     end
   end

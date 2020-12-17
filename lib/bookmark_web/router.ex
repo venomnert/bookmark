@@ -74,13 +74,13 @@ defmodule BookmarkWeb.Router do
 
   scope "/", BookmarkWeb do
     pipe_through [:browser, :require_authenticated_user]
-    
-    live "/contexts", ContextLive.Index, :index
-    live "/contexts/new", ContextLive.Index, :new
-    live "/contexts/:id/edit", ContextLive.Index, :edit
 
-    live "/contexts/:id", ContextLive.Show, :show
-    live "/contexts/:id/show/edit", ContextLive.Show, :edit
+    live "/contexts", ContextsLive.Index, :index
+    live "/contexts/new", ContextsLive.Index, :new
+    live "/contexts/:id/edit", ContextsLive.Index, :edit
+
+    live "/contexts/:id", ContextsLive.Show, :show
+    live "/contexts/:id/show/edit", ContextsLive.Show, :edit
   end
 
   scope "/", BookmarkWeb do

@@ -1,8 +1,8 @@
-defmodule BookmarkWeb.ContextLive.Index do
+defmodule BookmarkWeb.ContextsLive.Index do
   use BookmarkWeb, :live_view
 
   alias Bookmark.Core
-  alias Bookmark.Core.Context
+  alias Bookmark.Core.Contexts
 
   @impl true
   def mount(_params, _session, socket) do
@@ -16,19 +16,19 @@ defmodule BookmarkWeb.ContextLive.Index do
 
   defp apply_action(socket, :edit, %{"id" => id}) do
     socket
-    |> assign(:page_title, "Edit Context")
+    |> assign(:page_title, "Edit Contexts")
     |> assign(:context, Core.get_context!(id))
   end
 
   defp apply_action(socket, :new, _params) do
     socket
-    |> assign(:page_title, "New Context")
-    |> assign(:context, %Context{})
+    |> assign(:page_title, "New Contexts")
+    |> assign(:context, %Contexts{})
   end
 
   defp apply_action(socket, :index, _params) do
     socket
-    |> assign(:page_title, "Listing Contexts")
+    |> assign(:page_title, "Listing Contextss")
     |> assign(:context, nil)
   end
 

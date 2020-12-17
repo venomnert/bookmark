@@ -1,10 +1,10 @@
-defmodule BookmarkWeb.ContextLive.FormComponent do
+defmodule BookmarkWeb.ContextsLive.FormComponent do
   use BookmarkWeb, :live_component
 
   alias Bookmark.Core
 
   @impl true
-  def update(%{context: context} = assigns, socket) do
+  def update(%{contexts: context} = assigns, socket) do
     changeset = Core.change_context(context)
 
     {:ok,
@@ -14,7 +14,7 @@ defmodule BookmarkWeb.ContextLive.FormComponent do
   end
 
   @impl true
-  def handle_event("validate", %{"context" => context_params}, socket) do
+  def handle_event("validate", %{"contexts" => context_params}, socket) do
     changeset =
       socket.assigns.context
       |> Core.change_context(context_params)
@@ -23,7 +23,7 @@ defmodule BookmarkWeb.ContextLive.FormComponent do
     {:noreply, assign(socket, :changeset, changeset)}
   end
 
-  def handle_event("save", %{"context" => context_params}, socket) do
+  def handle_event("save", %{"contexts" => context_params}, socket) do
     save_context(socket, socket.assigns.action, context_params)
   end
 

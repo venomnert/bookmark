@@ -65,7 +65,7 @@ defmodule Bookmark.CoreTest do
   end
 
   describe "contexts" do
-    alias Bookmark.Core.Context
+    alias Bookmark.Core.Contexts
 
     @valid_attrs %{picture: "some picture", text: "some text", video: "some video"}
     @update_attrs %{picture: "some updated picture", text: "some updated text", video: "some updated video"}
@@ -91,7 +91,7 @@ defmodule Bookmark.CoreTest do
     end
 
     test "create_context/1 with valid data creates a context" do
-      assert {:ok, %Context{} = context} = Core.create_context(@valid_attrs)
+      assert {:ok, %Contexts{} = context} = Core.create_context(@valid_attrs)
       assert context.picture == "some picture"
       assert context.text == "some text"
       assert context.video == "some video"
@@ -103,7 +103,7 @@ defmodule Bookmark.CoreTest do
 
     test "update_context/2 with valid data updates the context" do
       context = context_fixture()
-      assert {:ok, %Context{} = context} = Core.update_context(context, @update_attrs)
+      assert {:ok, %Contexts{} = context} = Core.update_context(context, @update_attrs)
       assert context.picture == "some updated picture"
       assert context.text == "some updated text"
       assert context.video == "some updated video"
@@ -117,7 +117,7 @@ defmodule Bookmark.CoreTest do
 
     test "delete_context/1 deletes the context" do
       context = context_fixture()
-      assert {:ok, %Context{}} = Core.delete_context(context)
+      assert {:ok, %Contexts{}} = Core.delete_context(context)
       assert_raise Ecto.NoResultsError, fn -> Core.get_context!(context.id) end
     end
 

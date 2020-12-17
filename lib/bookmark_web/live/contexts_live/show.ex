@@ -1,4 +1,4 @@
-defmodule BookmarkWeb.ContextLive.Show do
+defmodule BookmarkWeb.ContextsLive.Show do
   use BookmarkWeb, :live_view
 
   alias Bookmark.Core

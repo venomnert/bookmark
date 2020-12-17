@@ -1,12 +1,12 @@
 <h1>Show Context</h1>
 
 <%= if @live_action in [:edit] do %>
-  <%= live_modal @socket, BookmarkWeb.ContextLive.FormComponent,
+  <%= live_modal_context @socket, BookmarkWeb.ContextLive.FormComponent,
     id: @context.id,
     title: @page_title,
     action: @live_action,
     context: @context,
-    return_to: Routes.context_show_path(@socket, :show, @context) %>
+    return_to: Routes.contexts_show_path(@socket, :show, @context) %>
 <% end %>
 
 <ul>
@@ -28,5 +28,5 @@
 
 </ul>
 
-<span><%= live_patch "Edit", to: Routes.context_show_path(@socket, :edit, @context), class: "button" %></span>
-<span><%= live_redirect "Back", to: Routes.context_index_path(@socket, :index) %></span>
+<span><%= live_patch "Edit", to: Routes.contexts_show_path(@socket, :edit, @context), class: "button" %></span>
+<span><%= live_redirect "Back", to: Routes.contexts_index_path(@socket, :index) %></span>
