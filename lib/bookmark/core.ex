@@ -6,7 +6,7 @@ defmodule Bookmark.Core do
   import Ecto.Query, warn: false
   alias Bookmark.Repo
 
-  alias Bookmark.Core.Bookmarks
+  alias Bookmark.Core.{Bookmarks, Contexts}
 
   @doc """
   Returns the list of bookmark.
@@ -102,7 +102,22 @@ defmodule Bookmark.Core do
     Bookmarks.changeset(bookmarks, attrs)
   end
 
-  alias Bookmark.Core.Context
+  def upsert_bookmark_context(%Bookmarks{} = bookmarks, context_ids) when is_list(context_ids) do
+    contexts =
+       Contexts
+      |> where([context], context.id in ^context_ids)
+      |> Repo.all()
+
+    with {:ok, _struct} <-
+          bookmarks
+          |> Repo.preload(:contexts)
+          |> Bookmarks.changeset_updated_context(contexts)
+          |> Repo.update() do
+      {:ok, __MODULE__.get_bookmarks!(bookmarks.id)}
+    else
+      error -> error
+    end
+  end
 
   @doc """
   Returns the list of contexts.
@@ -110,28 +125,28 @@ defmodule Bookmark.Core do
   ## Examples
 
       iex> list_contexts()
-      [%Context{}, ...]
+      [%Contexts{}, ...]
 
   """
   def list_contexts do
-    Repo.all(Context)
+    Repo.all(Contexts)
   end
 
   @doc """
   Gets a single context.
 
-  Raises `Ecto.NoResultsError` if the Context does not exist.
+  Raises `Ecto.NoResultsError` if the Contexts does not exist.
 
   ## Examples
 
       iex> get_context!(123)
-      %Context{}
+      %Contexts{}
 
       iex> get_context!(456)
       ** (Ecto.NoResultsError)
 
   """
-  def get_context!(id), do: Repo.get!(Context, id)
+  def get_context!(id), do: Repo.get!(Contexts, id)
 
   @doc """
   Creates a context.
@@ -139,15 +154,15 @@ defmodule Bookmark.Core do
   ## Examples
 
       iex> create_context(%{field: value})
-      {:ok, %Context{}}
+      {:ok, %Contexts{}}
 
       iex> create_context(%{field: bad_value})
       {:error, %Ecto.Changeset{}}
 
   """
   def create_context(attrs \\ %{}) do
-    %Context{}
-    |> Context.changeset(attrs)
+    %Contexts{}
+    |> Contexts.changeset(attrs)
     |> Repo.insert()
   end
 
@@ -157,15 +172,15 @@ defmodule Bookmark.Core do
   ## Examples
 
       iex> update_context(context, %{field: new_value})
-      {:ok, %Context{}}
+      {:ok, %Contexts{}}
 
       iex> update_context(context, %{field: bad_value})
       {:error, %Ecto.Changeset{}}
 
   """
-  def update_context(%Context{} = context, attrs) do
+  def update_context(%Contexts{} = context, attrs) do
     context
-    |> Context.changeset(attrs)
+    |> Contexts.changeset(attrs)
     |> Repo.update()
   end
 
@@ -175,13 +190,13 @@ defmodule Bookmark.Core do
   ## Examples
 
       iex> delete_context(context)
-      {:ok, %Context{}}
+      {:ok, %Contexts{}}
 
       iex> delete_context(context)
       {:error, %Ecto.Changeset{}}
 
   """
-  def delete_context(%Context{} = context) do
+  def delete_context(%Contexts{} = context) do
     Repo.delete(context)
   end
 
@@ -191,10 +206,10 @@ defmodule Bookmark.Core do
   ## Examples
 
       iex> change_context(context)
-      %Ecto.Changeset{data: %Context{}}
+      %Ecto.Changeset{data: %Contexts{}}
 
   """
-  def change_context(%Context{} = context, attrs \\ %{}) do
-    Context.changeset(context, attrs)
+  def change_context(%Contexts{} = context, attrs \\ %{}) do
+    Contexts.changeset(context, attrs)
   end
 end
