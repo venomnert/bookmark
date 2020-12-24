@@ -1,7 +1,7 @@
 <h1>Listing Contexts</h1>
 
 <%= if @live_action in [:new, :edit] do %>
-  <%= live_modal_context @socket, BookmarkWeb.ContextLive.FormComponent,
+  <%= live_modal_context @socket, BookmarkWeb.ContextsLive.FormComponent,
     id: @context.id || :new,
     title: @page_title,
     action: @live_action,
