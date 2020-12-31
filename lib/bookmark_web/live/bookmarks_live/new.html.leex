@@ -5,11 +5,3 @@
   bookmarks: @bookmarks,
   return_to: Routes.bookmarks_index_path(@socket, :index)
 %>
-
-<%= live_modal_context @socket, BookmarkWeb.ContextsLive.FormComponent,
-  id: @contexts.id || :new_context,
-  title: @page_title,
-  action: @live_action,
-  contexts: @contexts,
-  return_to: Routes.bookmarks_index_path(@socket, :index)
-%>
