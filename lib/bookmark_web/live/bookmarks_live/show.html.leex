@@ -1,4 +1,4 @@
-<h1>Show Bookmarks</h1>
+<h1>Show Bookmark</h1>
 
 <%= if @live_action in [:edit] do %>
   <%= live_modal_bookmark @socket, BookmarkWeb.BookmarksLive.FormComponent,
@@ -9,19 +9,34 @@
     return_to: Routes.bookmarks_show_path(@socket, :show, @bookmarks) %>
 <% end %>
 
-<ul>
+<div class="bg-white shadow-xl rounded-lg py-3">
+  <div class="p-2">
+    <h3 class="text-center text-xl text-gray-900 font-medium leading-8"><%= @bookmarks.name %></h3>
+    <a class="block hover:text-indigo-600 hover:underline text-center text-indigo-500" href="<%= @bookmarks.url %>"><%= @bookmarks.url %></a>
 
-  <li>
-    <strong>Name:</strong>
-    <%= @bookmarks.name %>
-  </li>
+    <div class="flex flex-col">
+      <h2 class="mb-2">Contexts</h2>
+      <%= for context <- @contexts do %>
+        <div class="flex flex-col">
+          <h3>Text: <%= context.text %></h3>
+          <div class="video">
+            <h3>Video</h3>
+            <video width="320" height="240" preload="auto" controls>
+              <source src="<%= context.video %>" type="video/mp4">
+              Your browser does not support the video tag.
+            </video>
+          </div>
+          <div class="picture">
+            <h3>Picture</h3>
+            <img src="<%= context.picture %>" alt="Context Image"/>
+          </div>
+        </div>
+      <% end %>
+    </div>
 
-  <li>
-    <strong>Url:</strong>
-    <%= @bookmarks.url %>
-  </li>
-
-</ul>
-
-<span><%= live_patch "Edit", to: Routes.bookmarks_show_path(@socket, :edit, @bookmarks), class: "button" %></span>
-<span><%= live_redirect "Back", to: Routes.bookmarks_index_path(@socket, :index) %></span>
+    <div class="text-center my-3">
+      <span><%= live_patch "Edit", to: Routes.bookmarks_edit_path(@socket, :edit, @bookmarks), class: "text-indigo-500 italic hover:underline hover:text-indigo-600 font-medium" %></span>
+      <span><%= live_redirect "Back", to: Routes.bookmarks_index_path(@socket, :index), class: "text-indigo-500 italic hover:underline hover:text-indigo-600 font-medium" %></span>
+    </div>
+  </div>
+</div>

@@ -2,7 +2,6 @@ defmodule BookmarkWeb.BookmarksLive.Edit do
   use BookmarkWeb, :live_view
 
   alias Bookmark.Core
-  alias Bookmark.Core.Bookmarks
 
   @impl true
   def mount(_params, _session, socket) do
@@ -17,7 +16,7 @@ defmodule BookmarkWeb.BookmarksLive.Edit do
   defp apply_action(socket, :edit, %{"id" => id}) do
     socket
     |> assign(:page_title, "Edit Bookmarks")
-    |> assign(:bookmarks, Core.get_bookmarks!(id))
+    |> assign(:bookmarks, Core.get_bookmarks_with_context!(id))
   end
 
   @impl true
