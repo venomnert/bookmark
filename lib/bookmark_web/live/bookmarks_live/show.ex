@@ -21,6 +21,6 @@ defmodule BookmarkWeb.BookmarksLive.Show do
     }
   end
 
-  defp page_title(:show), do: "Show Bookmarks"
-  defp page_title(:edit), do: "Edit Bookmarks"
+  defp page_title(:show), do: "Show Bookmark"
+  defp page_title(:edit), do: "Edit Bookmark"
 end
