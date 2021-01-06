@@ -1,0 +1,12 @@
+
+<div class="flex justify-end mb-4">
+  <%= live_patch "New Contexts", to: Routes.contexts_new_path(@socket, :new), class: "bg-blue-500 font-bold hover:bg-blue-700 px-4 py-2 rounded text-white" %>
+</div>
+
+<%= live_modal_bookmark @socket, BookmarkWeb.ContextsLive.FormComponent,
+  id: @contexts.id || :new,
+  title: @page_title,
+  action: @live_action,
+  contexts: @contexts,
+  return_to: Routes.contexts_index_path(@socket, :index)
+%>

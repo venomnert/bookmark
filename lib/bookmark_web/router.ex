@@ -76,9 +76,8 @@ defmodule BookmarkWeb.Router do
     pipe_through [:browser, :require_authenticated_user]
 
     live "/contexts", ContextsLive.Index, :index
-    live "/contexts/new", ContextsLive.Index, :new
-    live "/contexts/:id/edit", ContextsLive.Index, :edit
-
+    live "/contexts/new", ContextsLive.New, :new
+    live "/contexts/:id/edit", ContextsLive.Edit, :edit
     live "/contexts/:id", ContextsLive.Show, :show
     live "/contexts/:id/show/edit", ContextsLive.Show, :edit
   end
