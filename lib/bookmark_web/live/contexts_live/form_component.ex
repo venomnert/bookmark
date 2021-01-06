@@ -16,7 +16,7 @@ defmodule BookmarkWeb.ContextsLive.FormComponent do
   @impl true
   def handle_event("validate", %{"contexts" => context_params}, socket) do
     changeset =
-      socket.assigns.context
+      socket.assigns.contexts
       |> Core.change_context(context_params)
       |> Map.put(:action, :validate)
 
@@ -28,7 +28,7 @@ defmodule BookmarkWeb.ContextsLive.FormComponent do
   end
 
   defp save_context(socket, :edit, context_params) do
-    case Core.update_context(socket.assigns.context, context_params) do
+    case Core.update_context(socket.assigns.contexts, context_params) do
       {:ok, _context} ->
         {:noreply,
          socket

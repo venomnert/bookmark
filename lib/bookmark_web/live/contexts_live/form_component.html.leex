@@ -1,22 +1,26 @@
-<h2><%= @title %></h2>
+<div class="grid place-items-center mt-3">
+  <div class="bg-white lg:w-5/12 p-12 sm:w-8/12 w-11/12">
+    <h2 class="text-xl font-semibold"><%= @title %></h2>
+    <%= f = form_for @changeset, "#",
+      class: "mt-6",
+      id: "context-form",
+      phx_target: @myself,
+      phx_change: "validate",
+      phx_submit: "save" %>
 
-<%= f = form_for @changeset, "#",
-  id: "context-form",
-  phx_target: @myself,
-  phx_change: "validate",
-  phx_submit: "save" %>
+      <%= label f, :text, class: "block mt-2 text-xs font-semibold text-gray-600 uppercase" %>
+      <%= text_input f, :text, class: "block w-full p-3 mt-2 text-gray-700 bg-gray-200 appearance-none focus:outline-none focus:bg-gray-300 focus:shadow-inner" %>
+      <%= error_tag f, :text %>
 
-  <%= label f, :text %>
-  <%= text_input f, :text %>
-  <%= error_tag f, :text %>
+      <%= label f, :video, class: "block mt-2 text-xs font-semibold text-gray-600 uppercase" %>
+      <%= text_input f, :video, class: "block w-full p-3 mt-2 text-gray-700 bg-gray-200 appearance-none focus:outline-none focus:bg-gray-300 focus:shadow-inner" %>
+      <%= error_tag f, :video %>
 
-  <%= label f, :video %>
-  <%= text_input f, :video %>
-  <%= error_tag f, :video %>
+      <%= label f, :picture, class: "block mt-2 text-xs font-semibold text-gray-600 uppercase" %>
+      <%= text_input f, :picture, class: "block w-full p-3 mt-2 text-gray-700 bg-gray-200 appearance-none focus:outline-none focus:bg-gray-300 focus:shadow-inner" %>
+      <%= error_tag f, :picture %>
 
-  <%= label f, :picture %>
-  <%= text_input f, :picture %>
-  <%= error_tag f, :picture %>
-
-  <%= submit "Save", phx_disable_with: "Saving..." %>
-</form>
+      <%= submit "Save", phx_disable_with: "Saving...", class: "w-full py-3 mt-6 font-medium tracking-widest text-white uppercase bg-black shadow-lg focus:outline-none hover:bg-gray-900 hover:shadow-none" %>
+    </form>
+  </div>
+</div>
