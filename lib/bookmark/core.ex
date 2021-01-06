@@ -91,8 +91,7 @@ defmodule Bookmark.Core do
   end
 
   # TODO doc
-  def create_bookmarks(%{"context_id" => context_id} = attrs)
-      when is_integer(context_id) and context_id > 0 do
+  def create_bookmarks(%{"context_id" => context_id} = attrs) when is_integer(context_id) and context_id > 0 do
     %Bookmarks{}
     |> Bookmarks.changeset(attrs)
     |> Repo.insert()
@@ -100,6 +99,24 @@ defmodule Bookmark.Core do
       {:ok, bookmark} -> upsert_bookmark_context(bookmark, [context_id])
       {:error, error} -> {:error, error}
     end
+  end
+
+  @doc """
+  Creates a bookmarks.
+
+  ## Examples
+
+      iex> create_bookmarks(%{field: value})
+      {:ok, %Bookmarks{}}
+
+      iex> create_bookmarks(%{field: bad_value})
+      {:error, %Ecto.Changeset{}}
+
+  """
+  def create_bookmarks(%{"contexts" => %{"0" => %{"picture" => "", "text" => "", "video" => ""}}} = attrs) do
+    %Bookmarks{}
+    |> Bookmarks.changeset(attrs)
+    |> Repo.insert()
   end
 
   @doc """
@@ -129,24 +146,6 @@ defmodule Bookmark.Core do
       {:error, error} ->
         {:error, error}
     end
-  end
-
-  @doc """
-  Creates a bookmarks.
-
-  ## Examples
-
-      iex> create_bookmarks(%{field: value})
-      {:ok, %Bookmarks{}}
-
-      iex> create_bookmarks(%{field: bad_value})
-      {:error, %Ecto.Changeset{}}
-
-  """
-  def create_bookmarks(attrs) do
-    %Bookmarks{}
-    |> Bookmarks.changeset(attrs)
-    |> Repo.insert()
   end
 
   @doc """
