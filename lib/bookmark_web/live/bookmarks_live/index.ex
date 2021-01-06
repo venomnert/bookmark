@@ -6,9 +6,7 @@ defmodule BookmarkWeb.BookmarksLive.Index do
 
   @impl true
   def mount(_params, _session, socket) do
-    updated_socket = socket
-                    |> assign(:bookmark, list_bookmark())
-                    |> assign(:context, list_contexts())
+    updated_socket = assign(socket, :bookmark, list_bookmark())
 
     {:ok, updated_socket}
   end
@@ -22,7 +20,6 @@ defmodule BookmarkWeb.BookmarksLive.Index do
     socket
     |> assign(:page_title, "Edit Bookmarks")
     |> assign(:bookmarks, Core.get_bookmarks!(id))
-    |> assign(:page_title, "Edit Contexts")
     |> assign(:contexts, Core.get_context!(id))
   end
 
@@ -30,15 +27,13 @@ defmodule BookmarkWeb.BookmarksLive.Index do
     socket
     |> assign(:page_title, "New Bookmarks")
     |> assign(:bookmarks, %Bookmarks{})
-    |> assign(:page_title, "New Contexts")
     |> assign(:contexts, %Contexts{})
   end
 
   defp apply_action(socket, :index, _params) do
     socket
-    |> assign(:page_title, "Listing Bookmark")
+    |> assign(:page_title, "Listing Bookmarks")
     |> assign(:bookmarks, nil)
-    |> assign(:page_title, "Listing Contexts")
     |> assign(:contexts, nil)
   end
 
@@ -47,22 +42,11 @@ defmodule BookmarkWeb.BookmarksLive.Index do
     bookmarks = Core.get_bookmarks!(id)
     {:ok, _} = Core.delete_bookmarks(bookmarks)
 
-    context = Core.get_context!(id)
-    {:ok, _} = Core.delete_context(context)
-
-    updated_socket = socket
-                      |> assign(:bookmark, list_bookmark())
-                      |> assign(:contexts, list_contexts())
+    updated_socket = assign(socket, :bookmark, list_bookmark())
 
     {:noreply, updated_socket}
-
   end
 
-  defp list_bookmark do
-    Core.list_bookmark()
-  end
+  defp list_bookmark, do: Core.list_bookmark()
 
-  defp list_contexts do
-    Core.list_contexts()
-  end
 end
