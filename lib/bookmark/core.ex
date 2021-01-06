@@ -52,22 +52,6 @@ defmodule Bookmark.Core do
   def get_bookmarks!(id), do: Repo.get!(Bookmarks, id)
 
   @doc """
-  Gets a single bookmarks.
-
-  Raises `Ecto.NoResultsError` if the Bookmarks does not exist.
-
-  ## Examples
-
-      iex> get_bookmarks!(123)
-      %Bookmarks{}
-
-      iex> get_bookmarks!(456)
-      ** (Ecto.NoResultsError)
-
-  """
-  def get_bookmarks_with_contexts!(id), do: Repo.get!(Bookmarks, id) |> Repo.preload(:contexts)
-
-  @doc """
   Gets a single bookmarks with preloaded contexts.
 
   Raises `Ecto.NoResultsError` if the Bookmarks does not exist.
@@ -81,7 +65,11 @@ defmodule Bookmark.Core do
       ** (Ecto.NoResultsError)
 
   """
-  def get_bookmarks_with_context!(id), do: Repo.get!(Bookmarks, id) |> Repo.preload(:contexts)
+  def get_bookmarks_with_context!(id) do
+    Bookmarks
+    |> Repo.get!(id)
+    |> Repo.preload(:contexts)
+  end
 
   # TODO doc
   def empty_bookmark_with_context() do

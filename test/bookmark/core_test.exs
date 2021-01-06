@@ -197,7 +197,7 @@ defmodule Bookmark.CoreTest do
 
     test "get_bookmarks!/1 returns the bookmarks with given id" do
       bookmarks = bookmarks_fixture_with_contexts()
-      assert Core.get_bookmarks_with_contexts!(bookmarks.id) == bookmarks
+      assert Core.get_bookmarks_with_context!(bookmarks.id) == bookmarks
     end
 
     test "update_bookmarks/2 with valid data updates the bookmarks" do
