@@ -28,7 +28,7 @@ defmodule BookmarkWeb.ContextsLive.Index do
 
   defp apply_action(socket, :index, _params) do
     socket
-    |> assign(:page_title, "Listing Contextss")
+    |> assign(:page_title, "Listing Contexts")
     |> assign(:context, nil)
   end
 
