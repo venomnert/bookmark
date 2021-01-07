@@ -5,8 +5,8 @@ defmodule BookmarkWeb.ModalComponent do
   def render(assigns) do
     ~L"""
     <div class="phx-modal-content mt-20 md-mt:auto">
-      <%= live_patch raw("Back"), to: @return_to, class: "bg-blue-500 font-bold hover:bg-blue-700 px-4 py-2 rounded text-white" %>
       <%= live_component @socket, @component, @opts %>
+      <%= live_patch raw("Back"), to: @return_to, class: "bg-blue-600 block focus:outline-none font-medium hover:bg-blue-900 hover:shadow-none mt-6 mx-auto py-3 shadow-lg text-center text-white tracking-widest uppercase w-2/5" %>
     </div>
     """
   end
