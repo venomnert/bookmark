@@ -16,23 +16,33 @@
       <%= text_input f, :url, class: "block w-full p-3 mt-2 text-gray-700 bg-gray-200 appearance-none focus:outline-none focus:bg-gray-300 focus:shadow-inner" %>
       <%= error_tag f, :url %>
 
-      <%= select(f, :context_id, Enum.map(@contexts, &{&1.text, &1.id}), prompt: "Choose from existing contexts") %>
+      <%= if @action == :new do %>
+        <div>
+          <label for="bookmarks[context_create]">Create/Choose Context</label>
+          <%= checkbox f, :context_create, value: @context_create %>
+        </div>
+      <% end %>
 
-      <%= if !@context_disabled do %>
-        <%= inputs_for f, :contexts, fn fp -> %>
+      <%= if @context_create do %>
+        <%= select(f, :context_id, Enum.map(@contexts, &{&1.text, &1.id}), prompt: "Choose from existing contexts") %>
 
-          <%= label fp, :text, class: "block mt-2 text-xs font-semibold text-gray-600 uppercase" %>
-          <%= text_input fp, :text, class: "block w-full p-3 mt-2 text-gray-700 bg-gray-200 appearance-none focus:outline-none focus:bg-gray-300 focus:shadow-inner" %>
-          <%= error_tag fp, :text %>
+        <%= if !@context_disabled do %>
+          <%= inputs_for f, :contexts, fn fp -> %>
 
-          <%= label fp, :video, class: "block mt-2 text-xs font-semibold text-gray-600 uppercase" %>
-          <%= text_input fp, :video, class: "block w-full p-3 mt-2 text-gray-700 bg-gray-200 appearance-none focus:outline-none focus:bg-gray-300 focus:shadow-inner" %>
-          <%= error_tag fp, :video %>
+            <%= label fp, :text, class: "block mt-2 text-xs font-semibold text-gray-600 uppercase" %>
+            <%= text_input fp, :text, class: "block w-full p-3 mt-2 text-gray-700 bg-gray-200 appearance-none focus:outline-none focus:bg-gray-300 focus:shadow-inner" %>
+            <%= error_tag fp, :text %>
 
-          <%= label fp, :picture, class: "block mt-2 text-xs font-semibold text-gray-600 uppercase" %>
-          <%= text_input fp, :picture, class: "block w-full p-3 mt-2 text-gray-700 bg-gray-200 appearance-none focus:outline-none focus:bg-gray-300 focus:shadow-inner" %>
-          <%= error_tag fp, :picture %>
+            <%= label fp, :video, class: "block mt-2 text-xs font-semibold text-gray-600 uppercase" %>
+            <%= text_input fp, :video, class: "block w-full p-3 mt-2 text-gray-700 bg-gray-200 appearance-none focus:outline-none focus:bg-gray-300 focus:shadow-inner" %>
+            <%= error_tag fp, :video %>
+
+            <%= label fp, :picture, class: "block mt-2 text-xs font-semibold text-gray-600 uppercase" %>
+            <%= text_input fp, :picture, class: "block w-full p-3 mt-2 text-gray-700 bg-gray-200 appearance-none focus:outline-none focus:bg-gray-300 focus:shadow-inner" %>
+            <%= error_tag fp, :picture %>
+          <% end %>
         <% end %>
+
       <% end %>
 
       <%= submit "Save", phx_disable_with: "Saving...", class: "w-full py-3 mt-6 font-medium tracking-widest text-white uppercase bg-black shadow-lg focus:outline-none hover:bg-gray-900 hover:shadow-none" %>
