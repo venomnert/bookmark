@@ -5,7 +5,7 @@ defmodule BookmarkWeb.BookmarksLive.Edit do
 
   @impl true
   def mount(_params, _session, socket) do
-    {:ok, assign(socket, :bookmark, list_bookmark())}
+    {:ok, socket}
   end
 
   @impl true
@@ -19,15 +19,4 @@ defmodule BookmarkWeb.BookmarksLive.Edit do
     |> assign(:bookmarks, Core.get_bookmarks_with_context!(id))
   end
 
-  @impl true
-  def handle_event("delete", %{"id" => id}, socket) do
-    bookmarks = Core.get_bookmarks!(id)
-    {:ok, _} = Core.delete_bookmarks(bookmarks)
-
-    {:noreply, assign(socket, :bookmark, list_bookmark())}
-  end
-
-  defp list_bookmark do
-    Core.list_bookmark()
-  end
 end
