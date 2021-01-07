@@ -79,7 +79,7 @@ defmodule Bookmark.Core do
   end
 
   # TODO doc
-  def create_bookmarks(%{"context_id" => context_id} = attrs) when is_integer(context_id) and context_id > 0 do
+  def create_bookmarks(%{"context_id" => context_id} = attrs, :bookmark_selected_context) do
     %Bookmarks{}
     |> Bookmarks.changeset(attrs)
     |> Repo.insert()
@@ -101,13 +101,18 @@ defmodule Bookmark.Core do
       {:error, %Ecto.Changeset{}}
 
   """
-  def create_bookmarks(%{"contexts" => %{"0" => %{"picture" => "", "text" => "", "video" => ""}}} = attrs) do
+  def create_bookmarks(attrs, :bookmark_custom_context) do
     %Bookmarks{}
     |> Bookmarks.changeset(attrs)
+    |> Ecto.Changeset.cast_assoc(:contexts, with: &__MODULE__.change_context/2)
     |> Repo.insert()
+    |> case do
+      {:ok, bookmark} -> {:ok, bookmark}
+      {:error, error} -> {:error, error}
+    end
   end
 
-  @doc """
+    @doc """
   Creates a bookmarks.
 
   ## Examples
@@ -119,21 +124,10 @@ defmodule Bookmark.Core do
       {:error, %Ecto.Changeset{}}
 
   """
-  def create_bookmarks(%{"contexts" => contexts_list} = attrs) do
+  def create_bookmarks(attrs, :bookmark) do
     %Bookmarks{}
     |> Bookmarks.changeset(attrs)
     |> Repo.insert()
-    |> case do
-      {:ok, bookmark} ->
-        create_context(contexts_list["0"])
-        |> case do
-          {:ok, context} -> upsert_bookmark_context(bookmark, [context.id])
-          {:error, error} -> {:error, error}
-        end
-
-      {:error, error} ->
-        {:error, error}
-    end
   end
 
   @doc """
