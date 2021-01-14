@@ -31,38 +31,56 @@ defmodule BookmarkWeb.BookmarksLive.FormComponent do
      |> assign(:changeset, bookmarks_changeset)
      |> assign(:context_disabled, false)
      |> assign(contexts: contexts_list)
-     |> assign(context_create: true)
-    }
+     |> assign(context_create: true)}
   end
 
   @impl true
   def handle_event(
         "validate",
-        %{"bookmarks" => %{"context_create" => "false"}},
+        %{"bookmarks" => %{"context_create" => "false"} = bookmarks_params},
         %{assigns: %{action: :new}} = socket
       ) do
-    {:noreply, assign(socket, :context_create, false)}
-  end
+    socket = assign(socket, :context_create, false)
 
-  @impl true
-  def handle_event(
-        "validate",
-        %{"bookmarks" => %{"context_create" => "true"}},
-        %{assigns: %{action: :new}} = socket
-      ) do
-    {:noreply, assign(socket, :context_create, true)}
-  end
-
-  @impl true
-  def handle_event(
-        "validate",
-        %{"bookmarks" => %{"context_id" => context_id} = bookmarks_params},
-        %{assigns: %{action: :new}} = socket
-      ) do
-    context_id
+    bookmarks_params
+    |> Map.get("context_id")
     |> normalize_context_id()
     |> case do
-      0 ->
+      nil ->
+        updated_bookmark_changeset =
+          validate_bookmark_changeset(socket, %{"bookmarks" => bookmarks_params}, :bookmark)
+
+        {:noreply,
+         socket
+         |> assign(:changeset, updated_bookmark_changeset)}
+
+      id when id > 0 ->
+        bookmark_changeset =
+          socket.assigns.bookmarks
+          |> Core.change_bookmarks(bookmarks_params)
+          |> Map.put(:action, :validate)
+
+        {:noreply,
+         socket
+         |> assign(:changeset, bookmark_changeset)}
+    end
+
+    # TODO - when select is selected remove context changeset
+  end
+
+  @impl true
+  def handle_event(
+        "validate",
+        %{"bookmarks" => %{"context_create" => "true"} = bookmarks_params},
+        %{assigns: %{action: :new}} = socket
+      ) do
+    socket = assign(socket, :context_create, true)
+
+    bookmarks_params
+    |> Map.get("context_id")
+    |> normalize_context_id()
+    |> case do
+      nil ->
         updated_bookmark_changeset =
           validate_bookmark_changeset(socket, %{"bookmarks" => bookmarks_params})
 
@@ -89,17 +107,19 @@ defmodule BookmarkWeb.BookmarksLive.FormComponent do
     bookmark_changeset = validate_bookmark_changeset(socket, bookmarks_params)
 
     context_disabled =
-      bookmarks_params["bookmarks"]["context_id"]
+      bookmarks_params["bookmarks"]["contexts"]["0"]["id"]
       |> normalize_context_id()
       |> case do
-        0 -> false
-        id when id > 0 -> true
+        nil -> true
+        id when id > 0 -> false
       end
 
     {:noreply,
      socket
      |> assign(:changeset, bookmark_changeset)
-     |> assign(:context_disabled, context_disabled)}
+     |> assign(:context_disabled, context_disabled)
+    }
+
 
     # TODO - when select is selected remove context changeset
   end
@@ -109,8 +129,8 @@ defmodule BookmarkWeb.BookmarksLive.FormComponent do
         %{"bookmarks" => %{"context_id" => context_id} = bookmarks_params},
         socket
       ) do
-
-    updated_bookmarks_params = Map.put(bookmarks_params, "context_id", normalize_context_id(context_id))
+    updated_bookmarks_params =
+      Map.put(bookmarks_params, "context_id", normalize_context_id(context_id))
 
     save_bookmarks(socket, socket.assigns.action, updated_bookmarks_params)
   end
@@ -121,7 +141,6 @@ defmodule BookmarkWeb.BookmarksLive.FormComponent do
 
   defp save_bookmarks(socket, :new, bookmarks_params) do
     {type, updated_bookmarks_params} = check_bookmarks_params(bookmarks_params)
-    IO.inspect(type, label: "TYPE")
 
     case Core.create_bookmarks(updated_bookmarks_params, type) do
       {:ok, _bookmarks} ->
@@ -151,6 +170,42 @@ defmodule BookmarkWeb.BookmarksLive.FormComponent do
   defp validate_bookmark_changeset(%{assigns: %{action: :new}} = socket, %{
          "bookmarks" => bookmarks_params
        }) do
+    bookmarks_params["contexts"]["0"]
+    |> case do
+      nil ->
+        socket.assigns.bookmarks
+        |> Core.change_bookmarks(bookmarks_params, :empty_context)
+        |> Map.put(:action, :validate)
+
+      _ ->
+        validate_bookmark_changeset(socket, %{"bookmarks" => bookmarks_params}, :filled_context)
+    end
+  end
+
+  defp validate_bookmark_changeset(%{assigns: %{action: :edit}} = socket, %{
+         "bookmarks" => bookmarks_params
+       }) do
+    socket.assigns.bookmarks
+    |> Core.change_bookmarks(bookmarks_params, :filled_context)
+    |> Map.put(:action, :validate)
+    |> IO.inspect(label: "RESULTS")
+  end
+
+  defp validate_bookmark_changeset(
+         %{assigns: %{action: :new}} = socket,
+         %{"bookmarks" => bookmarks_params},
+         :bookmark
+       ) do
+    socket.assigns.bookmarks
+    |> Core.change_bookmarks(bookmarks_params)
+    |> Map.put(:action, :validate)
+  end
+
+  defp validate_bookmark_changeset(
+         %{assigns: %{action: :new}} = socket,
+         %{"bookmarks" => bookmarks_params},
+         :filled_context
+       ) do
     context =
       %Contexts{}
       |> Core.change_context(bookmarks_params["contexts"]["0"])
@@ -173,33 +228,36 @@ defmodule BookmarkWeb.BookmarksLive.FormComponent do
     updated_bookmark_changeset
   end
 
-  defp validate_bookmark_changeset(%{assigns: %{action: :edit}} = socket, %{
-         "bookmarks" => bookmarks_params
-       }) do
-    socket.assigns.bookmarks
-    |> Core.change_bookmarks(bookmarks_params)
-    |> Map.put(:action, :validate)
-    |> Ecto.Changeset.cast_assoc(:contexts, with: &Core.change_context/2)
-  end
-
   defp check_bookmarks_params(bookmarks_params) do
     context_id = bookmarks_params |> Map.get("context_id") |> normalize_context_id()
     context_params = bookmarks_params |> get_in(["contexts", "0"])
 
     cond do
-      context_id == nil && context_params == nil -> {:bookmark, bookmarks_params}
-      is_integer(context_id) == true && context_id > 0 -> {:bookmark_selected_context, bookmarks_params}
-      validate_contexts_params(context_params) == true -> {:bookmark_custom_context, bookmarks_params}
-      validate_contexts_params(context_params) == false -> {:bookmark_custom_context, bookmarks_params}
-      true -> {:bookmark, bookmarks_params}
-    end
+      context_id == nil && context_params == nil ->
+        {:bookmark, bookmarks_params}
 
+      is_integer(context_id) == true && context_id > 0 ->
+        {:bookmark_selected_context, bookmarks_params}
+
+      validate_contexts_params(context_params) == true ->
+        {:bookmark_custom_context, bookmarks_params}
+
+      validate_contexts_params(context_params) == false ->
+        {:bookmark_custom_context, bookmarks_params}
+
+      true ->
+        {:bookmark, bookmarks_params}
+    end
   end
 
-  defp normalize_context_id(nil), do: nil
-  defp normalize_context_id(""), do: 0
-  defp normalize_context_id(context_id) when is_integer(context_id), do: context_id
-  defp normalize_context_id(context_id), do: String.to_integer(context_id)
+  defp normalize_context_id(context_id) do
+    cond do
+      is_integer(context_id) -> context_id
+      context_id == "" -> nil
+      is_nil(context_id) -> nil
+      true -> String.to_integer(context_id)
+    end
+  end
 
   defp validate_contexts_params(context_params) do
     context_params
@@ -210,10 +268,9 @@ defmodule BookmarkWeb.BookmarksLive.FormComponent do
 
   defp convert_empty_to_falsy(values) do
     values
-    |> Enum.reduce([], &(convert_to_nill(&1, &2)))
+    |> Enum.reduce([], &convert_to_nill(&1, &2))
   end
 
   defp convert_to_nill("", acc), do: [nil] ++ acc
   defp convert_to_nill(val, acc), do: [val] ++ acc
-
 end
