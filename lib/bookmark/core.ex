@@ -112,7 +112,7 @@ defmodule Bookmark.Core do
     end
   end
 
-    @doc """
+  @doc """
   Creates a bookmarks.
 
   ## Examples
@@ -163,6 +163,11 @@ defmodule Bookmark.Core do
   def update_bookmarks(%Bookmarks{} = bookmarks, %{"context_id" => context_id} = attrs, :edit) do
     context_id
     |> case do
+      nil ->
+        bookmarks
+        |> __MODULE__.change_bookmarks(attrs, :filled_context)
+        |> Repo.update()
+
       0 ->
         contexts_changeset = change_context(%Contexts{}, get_in(attrs, ["contexts", "0"]))
 
@@ -226,6 +231,15 @@ defmodule Bookmark.Core do
   def change_bookmarks(%Bookmarks{} = bookmarks, attrs \\ %{}) do
     Bookmarks.changeset(bookmarks, attrs)
   end
+
+  def change_bookmarks(%Bookmarks{} = bookmarks, attrs, :empty_context) do
+    Bookmarks.changeset(bookmarks, attrs, :empty_context)
+  end
+
+  def change_bookmarks(%Bookmarks{} = bookmarks, attrs, :filled_context) do
+    Bookmarks.changeset(bookmarks, attrs, :filled_context)
+  end
+
 
   def upsert_bookmark_context(%Bookmarks{} = bookmarks, context_ids) when is_list(context_ids) do
     contexts =
