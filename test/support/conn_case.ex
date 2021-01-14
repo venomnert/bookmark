@@ -26,6 +26,13 @@ defmodule BookmarkWeb.ConnCase do
 
       alias BookmarkWeb.Router.Helpers, as: Routes
 
+      def session_conn() do
+        build_conn()
+        |> Plug.Test.init_test_session(%{})
+        |> Map.put(:state, :unset)
+        |> Map.put(:status, nil)
+      end
+
       # The default endpoint for testing
       @endpoint BookmarkWeb.Endpoint
     end
