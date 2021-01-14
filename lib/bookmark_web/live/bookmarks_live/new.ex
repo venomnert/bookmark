@@ -2,7 +2,7 @@ defmodule BookmarkWeb.BookmarksLive.New do
   use BookmarkWeb, :live_view
 
   alias Bookmark.Core
-  alias Bookmark.Core.{Contexts}
+  alias Bookmark.Core.{Bookmarks, Contexts}
 
   @impl true
   def mount(_params, _session, socket) do
@@ -17,8 +17,8 @@ defmodule BookmarkWeb.BookmarksLive.New do
   defp apply_action(socket, :new, _params) do
     socket
     |> assign(:page_title, "New Bookmarks")
-    |> assign(:bookmarks, Core.empty_bookmark_with_context())
-    |> assign(:contexts, %Contexts{})
+    |> assign(:bookmarks, %Bookmarks{})
+    |> assign(context_create: false)
   end
 
 end
