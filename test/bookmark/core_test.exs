@@ -14,7 +14,7 @@ defmodule Bookmark.CoreTest do
       {:ok, bookmarks} =
         attrs
         |> Enum.into(@valid_attrs)
-        |> Core.create_bookmarks()
+        |> Core.create_bookmarks(:bookmark)
 
       bookmarks
     end
@@ -30,13 +30,13 @@ defmodule Bookmark.CoreTest do
     end
 
     test "create_bookmarks/1 with valid data creates a bookmarks" do
-      assert {:ok, %Bookmarks{} = bookmarks} = Core.create_bookmarks(@valid_attrs)
+      assert {:ok, %Bookmarks{} = bookmarks} = Core.create_bookmarks(@valid_attrs, :bookmark)
       assert bookmarks.name == "some name"
       assert bookmarks.url == "some url"
     end
 
     test "create_bookmarks/1 with invalid data returns error changeset" do
-      assert {:error, %Ecto.Changeset{}} = Core.create_bookmarks(@invalid_attrs)
+      assert {:error, %Ecto.Changeset{}} = Core.create_bookmarks(@invalid_attrs, :bookmark)
     end
 
     test "update_bookmarks/2 with valid data updates the bookmarks" do
@@ -141,7 +141,7 @@ defmodule Bookmark.CoreTest do
     def bookmarks_fixture_with_contexts() do
       {:ok, %Contexts{} = context} = Core.create_context(@valid_attrs)
       valid_attrs_bookmark_with_context = @valid_attrs_bookmarks |> Map.put("context_id", context.id)
-      {:ok, %Bookmarks{} = bookmarks} = Core.create_bookmarks(valid_attrs_bookmark_with_context)
+      {:ok, %Bookmarks{} = bookmarks} = Core.create_bookmarks(valid_attrs_bookmark_with_context, :bookmark_selected_context)
 
       bookmarks
     end
@@ -150,7 +150,7 @@ defmodule Bookmark.CoreTest do
       assert {:ok, %Contexts{} = context} = Core.create_context(@valid_attrs_contexts)
       valid_attrs_bookmark_with_context = @valid_attrs_bookmarks |> Map.put("context_id", context.id)
 
-      assert {:ok, %Bookmarks{} = bookmarks} = Core.create_bookmarks(valid_attrs_bookmark_with_context)
+      assert {:ok, %Bookmarks{} = bookmarks} = Core.create_bookmarks(valid_attrs_bookmark_with_context, :bookmark_selected_context)
       contexts = bookmarks.contexts |> List.first()
 
       assert bookmarks.name == "some name"
@@ -164,7 +164,7 @@ defmodule Bookmark.CoreTest do
       assert {:ok, %Contexts{} = context} = Core.create_context(@valid_attrs_contexts)
       invalid_attrs_bookmark_with_context = @invalid_attrs_bookmarks |> Map.put("context_id", context.id)
 
-      assert {:error, _} = Core.create_bookmarks(invalid_attrs_bookmark_with_context)
+      assert {:error, _} = Core.create_bookmarks(invalid_attrs_bookmark_with_context, :bookmark_selected_context)
     end
 
     test "create_bookmarks/1 with invalid context" do
@@ -174,7 +174,7 @@ defmodule Bookmark.CoreTest do
     test "create_bookmarks/1 with valid context attrs" do
       valid_attrs_bookmark_with_context = @valid_attrs_bookmarks |> Map.put("contexts", %{"0" => @valid_attrs_contexts})
 
-      assert {:ok, %Bookmarks{} = bookmarks} = Core.create_bookmarks(valid_attrs_bookmark_with_context)
+      assert {:ok, %Bookmarks{} = bookmarks} = Core.create_bookmarks(valid_attrs_bookmark_with_context, :bookmark_custom_context)
       contexts = bookmarks.contexts |> List.first()
 
       assert bookmarks.name == "some name"
@@ -187,7 +187,7 @@ defmodule Bookmark.CoreTest do
     test "create_bookmarks/1 with invalid context attrs" do
       valid_attrs_bookmark_with_context = @valid_attrs_bookmarks |> Map.put("contexts", %{"0" => @invalid_attrs_contexts})
 
-      assert {:error, _} = Core.create_bookmarks(valid_attrs_bookmark_with_context)
+      assert {:error, _} = Core.create_bookmarks(valid_attrs_bookmark_with_context, :bookmark_custom_context)
     end
 
     test "list_bookmark_with_context/0 returns all bookmark with contexts" do
