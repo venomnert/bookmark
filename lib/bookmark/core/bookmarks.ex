@@ -31,27 +31,15 @@ defmodule Bookmark.Core.Bookmarks do
     bookmarks
     |> cast(attrs, [:name, :url])
     |> validate_required([:name, :url])
-    |> put_assoc(:contexts, [%Contexts{}])  # TODO ensure to accomodate for many context for bookmarks
+    # TODO ensure to accomodate for many context for bookmarks
+    |> put_assoc(:contexts, [%Contexts{}])
   end
 
   @doc false
-  def changeset(bookmarks, attrs, :filled_context) do
-    # TODO refactor to use ecto function
-
-    # contexts = attrs |> get_in(["contexts", "0"])
-    # contexts = %{
-    #   "id" => 5,
-    #   "picture" => "/hom/img",
-    #   "text" => "Context 23",
-    #   "video" => "/hom/vid"
-    # }
-
-    # attrs = attrs |> Map.put("contexts", [contexts])
-
+  def changeset(bookmarks, attrs, :selected_context) do
     bookmarks
-    |> cast(attrs, [:name, :url])
+    |> __MODULE__.changeset(attrs)
     |> cast_assoc(:contexts, with: &Contexts.changeset/2)
-    |> IO.inspect(label: "CONTEXT FINAL")
   end
 
   def changeset_updated_context(bookmarks, context) do

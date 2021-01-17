@@ -164,7 +164,7 @@ defmodule Bookmark.Core do
     |> case do
       nil ->
         bookmarks
-        |> __MODULE__.change_bookmarks(attrs, :filled_context)
+        |> __MODULE__.change_bookmarks(attrs, :selected_context)
         |> Repo.update()
 
       0 ->
@@ -235,10 +235,9 @@ defmodule Bookmark.Core do
     Bookmarks.changeset(bookmarks, attrs, :empty_context)
   end
 
-  def change_bookmarks(%Bookmarks{} = bookmarks, attrs, :filled_context) do
-    Bookmarks.changeset(bookmarks, attrs, :filled_context)
+  def change_bookmarks(%Bookmarks{} = bookmarks, attrs, :selected_context) do
+    Bookmarks.changeset(bookmarks, attrs, :selected_context)
   end
-
 
   @doc """
   Returns the list of contexts.
