@@ -1,8 +1,7 @@
 defmodule BookmarkWeb.BookmarksLive.New do
   use BookmarkWeb, :live_view
 
-  alias Bookmark.Core
-  alias Bookmark.Core.{Bookmarks, Contexts}
+  alias Bookmark.Core.{Bookmarks}
 
   @impl true
   def mount(_params, _session, socket) do
