@@ -8,14 +8,12 @@ defmodule BookmarkWeb.BookmarksLive.FormComponent do
   @impl true
   def update(%{bookmarks: bookmarks, action: :new} = assigns, socket) do
     bookmark_changeset = Core.change_bookmarks(bookmarks)
-    contexts_list = Core.list_contexts()
 
     {:ok,
      socket
      |> assign(assigns)
      |> assign(:changeset, bookmark_changeset)
      |> assign(:context_disabled, false)
-     |> assign(contexts: contexts_list)
      |> assign(context_create: false)
     }
   end
@@ -74,7 +72,12 @@ defmodule BookmarkWeb.BookmarksLive.FormComponent do
         %{"bookmarks" => %{"context_create" => "true"} = bookmarks_params},
         %{assigns: %{action: :new}} = socket
       ) do
-    socket = assign(socket, :context_create, true)
+
+    contexts_list = Core.list_contexts()
+
+    socket = socket
+            |> assign(:context_create, true)
+            |> assign(contexts: contexts_list)
 
     bookmarks_params
     |> Map.get("context_id")
@@ -239,10 +242,7 @@ defmodule BookmarkWeb.BookmarksLive.FormComponent do
       is_integer(context_id) == true && context_id > 0 ->
         {:bookmark_selected_context, bookmarks_params}
 
-      validate_contexts_params(context_params) == true ->
-        {:bookmark_custom_context, bookmarks_params}
-
-      validate_contexts_params(context_params) == false ->
+      validate_contexts_params(context_params) == true || validate_contexts_params(context_params) == false ->
         {:bookmark_custom_context, bookmarks_params}
 
       true ->

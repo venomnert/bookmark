@@ -21,11 +21,11 @@ defmodule Bookmark.Core do
   end
 
   @doc """
-  Returns the list of bookmark.
+  Returns the list of bookmarks with contexts preloaded.
 
   ## Examples
 
-      iex> list_bookmark()
+      iex> list_bookmark_with_context()
       [%Bookmarks{}, ...]
 
   """
@@ -71,33 +71,36 @@ defmodule Bookmark.Core do
     |> Repo.preload(:contexts)
   end
 
-  # TODO doc
-  def empty_bookmark_with_context() do
-    %Bookmarks{}
-    |> Repo.preload(:contexts)
-    |> Map.put(:contexts, [%Contexts{}])
-  end
-
-  # TODO doc
-  def create_bookmarks(%{"context_id" => context_id} = attrs, :bookmark_selected_context) do
-    %Bookmarks{}
-    |> Bookmarks.changeset(attrs)
-    |> Repo.insert()
-    |> case do
-      {:ok, bookmark} -> upsert_bookmark_context(bookmark, [context_id])
-      {:error, error} -> {:error, error}
-    end
-  end
-
   @doc """
-  Creates a bookmarks.
+  Creates a bookmark with an existing context.
 
   ## Examples
 
-      iex> create_bookmarks(%{field: value})
+      iex> create_bookmarks(%{field: value}, :bookmark_selected_context))
       {:ok, %Bookmarks{}}
 
-      iex> create_bookmarks(%{field: bad_value})
+      iex> create_bookmarks(%{field: bad_value}, :bookmark_selected_context))
+      {:error, %Ecto.Changeset{}}
+
+  """
+  def create_bookmarks(%{"context_id" => context_id} = attrs, :bookmark_selected_context) do
+    selected_context = __MODULE__.get_context!(context_id)
+
+    %Bookmarks{}
+    |> Bookmarks.changeset(attrs)
+    |> Ecto.Changeset.put_assoc(:contexts, [selected_context])
+    |> Repo.insert()
+  end
+
+  @doc """
+  Creates a bookmark with a new context.
+
+  ## Examples
+
+      iex> create_bookmarks(%{field: value}, :bookmark_custom_context)
+      {:ok, %Bookmarks{}}
+
+      iex> create_bookmarks(%{field: bad_value}, :bookmark_custom_context)
       {:error, %Ecto.Changeset{}}
 
   """
@@ -106,10 +109,6 @@ defmodule Bookmark.Core do
     |> Bookmarks.changeset(attrs)
     |> Ecto.Changeset.cast_assoc(:contexts, with: &__MODULE__.change_context/2)
     |> Repo.insert()
-    |> case do
-      {:ok, bookmark} -> {:ok, bookmark}
-      {:error, error} -> {:error, error}
-    end
   end
 
   @doc """
@@ -240,23 +239,6 @@ defmodule Bookmark.Core do
     Bookmarks.changeset(bookmarks, attrs, :filled_context)
   end
 
-
-  def upsert_bookmark_context(%Bookmarks{} = bookmarks, context_ids) when is_list(context_ids) do
-    contexts =
-      Contexts
-      |> where([context], context.id in ^context_ids)
-      |> Repo.all()
-
-    with {:ok, _struct} <-
-           bookmarks
-           |> Repo.preload(:contexts)
-           |> Bookmarks.changeset_updated_context(contexts)
-           |> Repo.update() do
-      {:ok, __MODULE__.get_bookmarks_with_context!(bookmarks.id)}
-    else
-      error -> error
-    end
-  end
 
   @doc """
   Returns the list of contexts.
