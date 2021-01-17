@@ -190,14 +190,6 @@ defmodule BookmarkWeb.BookmarksLive.FormComponent do
     end
   end
 
-  defp validate_bookmark_changeset(%{assigns: %{action: :edit}} = socket, %{
-         "bookmarks" => bookmarks_params
-       }) do
-    socket.assigns.bookmarks
-    |> Core.change_bookmarks(bookmarks_params, :selected_context)
-    |> Map.put(:action, :validate)
-  end
-
   defp validate_bookmark_changeset(
          %{assigns: %{action: :new}} = socket,
          %{"bookmarks" => bookmarks_params},
