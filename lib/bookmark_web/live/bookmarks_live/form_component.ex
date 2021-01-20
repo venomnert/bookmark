@@ -5,42 +5,9 @@ defmodule BookmarkWeb.BookmarksLive.FormComponent do
   alias Bookmark.Core.{Contexts}
   alias Ecto
 
+  # Testing form component - custom context
   @impl true
-  def update(
-        %{
-          bookmarks: bookmarks,
-          action: :new_test,
-          create_bookmark: :selected_context,
-          bookmarks_params: bookmarks_params,
-          contexts: contexts
-        } = assigns,
-        socket
-      ) do
-    bookmark_changeset =
-      bookmarks
-      |> Core.change_bookmarks(bookmarks_params, :empty_context)
-      |> Map.put(:action, :validate)
-
-    {:ok,
-     socket
-     |> assign(assigns)
-     |> assign(:changeset, bookmark_changeset)
-     |> assign(:context_disabled, false)
-     |> assign(context_create: true)
-     |> assign(contexts: contexts)
-    }
-  end
-
-  @impl true
-  def update(
-        %{
-          bookmarks: bookmarks,
-          action: :new_test,
-          create_bookmark: :empty_context,
-          bookmarks_params: bookmarks_params
-        } = assigns,
-        socket
-      ) do
+  def update(%{bookmarks: bookmarks, action: :test_custom, bookmarks_params: bookmarks_params} = assigns, socket) do
     bookmark_changeset =
       bookmarks
       |> Core.change_bookmarks(bookmarks_params, :empty_context)
@@ -56,8 +23,27 @@ defmodule BookmarkWeb.BookmarksLive.FormComponent do
     }
   end
 
+  # Testing form component - existing context
   @impl true
-  def update(%{bookmarks: bookmarks, action: :new_test} = assigns, socket) do
+  def update(%{bookmarks: bookmarks, action: :test_existing, bookmarks_params: bookmarks_params} = assigns, socket) do
+    bookmark_changeset =
+      bookmarks
+      |> Core.change_bookmarks(bookmarks_params)
+      |> Map.put(:action, :validate)
+
+    {:ok,
+     socket
+     |> assign(assigns)
+     |> assign(:changeset, bookmark_changeset)
+     |> assign(:context_disabled, false)
+     |> assign(context_create: true)
+     |> assign(contexts: assigns.contexts)
+    }
+  end
+
+  # Testing form input - custom context
+  @impl true
+  def update(%{bookmarks: bookmarks, action: :test_custom} = assigns, socket) do
     bookmark_changeset =
       bookmarks
       |> Core.change_bookmarks(%{}, :empty_context)
@@ -73,8 +59,9 @@ defmodule BookmarkWeb.BookmarksLive.FormComponent do
     }
   end
 
+  # Testing form input - existing context
   @impl true
-  def update(%{bookmarks: bookmarks, action: :new_test_select} = assigns, socket) do
+  def update(%{bookmarks: bookmarks, action: :test_existing} = assigns, socket) do
     bookmark_changeset =
       bookmarks
       |> Core.change_bookmarks()
@@ -187,8 +174,6 @@ defmodule BookmarkWeb.BookmarksLive.FormComponent do
          socket
          |> assign(:changeset, bookmark_changeset)}
     end
-
-    # TODO - when select is selected remove context changeset
   end
 
   @impl true
@@ -247,7 +232,8 @@ defmodule BookmarkWeb.BookmarksLive.FormComponent do
     end
   end
 
-  defp save_bookmarks(socket, :new_test, bookmarks_params) do
+  # Testing form submit - custom context
+  defp save_bookmarks(socket, :test_custom, bookmarks_params) do
     {type, updated_bookmarks_params} = check_bookmarks_params(bookmarks_params)
 
     case Core.create_bookmarks(updated_bookmarks_params, type) do
@@ -262,7 +248,8 @@ defmodule BookmarkWeb.BookmarksLive.FormComponent do
     end
   end
 
-  defp save_bookmarks(socket, :new_test_select, bookmarks_params) do
+  # Testing form submit - existing context
+  defp save_bookmarks(socket, :test_existing, bookmarks_params) do
     {type, updated_bookmarks_params} = check_bookmarks_params(bookmarks_params)
 
     case Core.create_bookmarks(updated_bookmarks_params, type) do
@@ -351,7 +338,6 @@ defmodule BookmarkWeb.BookmarksLive.FormComponent do
         {:bookmark, bookmarks_params}
 
       is_integer(context_id) == true && context_id > 0 ->
-        IO.inspect(label: "CALLED")
         {:bookmark_selected_context, bookmarks_params}
 
       validate_contexts_params(context_params) == true ||

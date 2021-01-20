@@ -83,14 +83,13 @@ defmodule BookmarkWeb.BookmarksLiveTest do
       assert render_component(BookmarkWeb.BookmarksLive.FormComponent,
                id: bookmarks.id || :new_bookmark,
                title: "New bookmarks",
-               action: :new_test,
-               create_bookmark: :empty_context,
+               action: :test_custom,
                bookmarks_params: @create_attrs_with_context,
                bookmarks: bookmarks,
                return_to: Routes.bookmarks_index_path(conn, :index)
              ) =~ "existing contexts"
 
-      {:ok, view, _} = live(conn, Routes.bookmarks_new_path(conn, :new_test))
+      {:ok, view, _} = live(conn, Routes.bookmarks_new_path(conn, :test_custom))
 
       view
       |> form("#bookmarks-form", bookmarks: @create_attrs_with_context)
@@ -111,20 +110,19 @@ defmodule BookmarkWeb.BookmarksLiveTest do
     test "saves new bookmarks with existing contexts", %{conn: conn, bookmarks: bookmarks} do
       bookmarks = bookmarks |> Repo.preload(:contexts)
       {:ok, new_context} = Core.create_context(@valid_context_attrs)
-      updated_create_attrs = Map.put(@create_attrs, "context_id", Integer.to_string(new_context.id))
+      updated_create_attrs = Map.put(@create_attrs, :context_id, Integer.to_string(new_context.id))
 
       assert render_component(BookmarkWeb.BookmarksLive.FormComponent,
                id: bookmarks.id || :new_bookmark,
                title: "New bookmarks",
-               action: :new_test,
-               create_bookmark: :selected_context,
-               bookmarks_params: @create_attrs,
+               action: :test_existing,
+               bookmarks_params: updated_create_attrs,
                contexts: [new_context],
                bookmarks: bookmarks,
                return_to: Routes.bookmarks_index_path(conn, :index)
              ) =~ new_context.text
 
-      {:ok, view, _} = live(conn, Routes.bookmarks_new_path(conn, :new_test_select))
+      {:ok, view, _} = live(conn, Routes.bookmarks_new_path(conn, :test_existing))
 
       view
       |> form("#bookmarks-form", bookmarks: updated_create_attrs)
