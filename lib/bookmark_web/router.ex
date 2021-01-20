@@ -67,6 +67,8 @@ defmodule BookmarkWeb.Router do
 
     live "/bookmark", BookmarksLive.Index, :index
     live "/bookmark/new", BookmarksLive.New, :new
+    live "/bookmark/new-test", BookmarksLive.New, :new_test
+    live "/bookmark/new-test-select", BookmarksLive.New, :new_test_select
     live "/bookmark/:id/edit", BookmarksLive.Edit, :edit
     live "/bookmark/:id", BookmarksLive.Show, :show
     live "/bookmark/:id/show/edit", BookmarksLive.Show, :edit

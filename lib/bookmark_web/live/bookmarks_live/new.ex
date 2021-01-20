@@ -20,4 +20,15 @@ defmodule BookmarkWeb.BookmarksLive.New do
     |> assign(context_create: false)
   end
 
+  defp apply_action(socket, :new_test_select, _params) do
+    socket
+    |> assign(:page_title, "Test context select")
+    |> assign(:bookmarks, %Bookmarks{})
+  end
+
+  defp apply_action(socket, :new_test, _params) do
+    socket
+    |> assign(:page_title, "Test new context")
+    |> assign(:bookmarks, %Bookmarks{})
+  end
 end
