@@ -4,6 +4,7 @@ defmodule Bookmark.Core do
   """
 
   import Ecto.Query, warn: false
+  alias Ecto.Changeset
   alias Bookmark.Repo
   alias Bookmark.Core.{Bookmarks, Contexts}
 
@@ -187,7 +188,7 @@ defmodule Bookmark.Core do
 
       id when id > 0 ->
         id
-        |> get_context()
+        |> __MODULE__.get_context!()
         |> case do
           nil ->
             {:error, nil}
@@ -200,6 +201,55 @@ defmodule Bookmark.Core do
             |> Repo.update()
         end
     end
+  end
+
+  @doc """
+  Append a context to bookmark.
+
+  ## Examples
+
+      iex> update_bookmarks(bookmarks, %{field: new_value})
+      {:ok, %Bookmarks{}}
+
+      iex> update_bookmarks(bookmarks, %{field: bad_value})
+      {:error, %Ecto.Changeset{}}
+
+  """
+  def add_context(%Bookmarks{} = bookmarks, %{"context_id" => context_id} = attrs) do
+    context_id
+    |> case do
+      nil ->
+        {:ok, context} = __MODULE__.create_context(attrs)
+
+        bookmarks
+        |> Ecto.Changeset.change()
+        |> Ecto.Changeset.put_assoc(:contexts, [context | bookmarks.contexts])
+        |> Repo.update()
+
+      id when id > 0 ->
+        id
+        |> __MODULE__.get_context!()
+        |> case do
+          nil ->
+            {:error, nil}
+
+          context ->
+            bookmarks
+            |> Ecto.Changeset.change()
+            |> Ecto.Changeset.put_assoc(:contexts, [context | bookmarks.contexts])
+            |> Repo.update()
+        end
+    end
+  end
+
+  def delete_context_from_bookmark(%Bookmarks{} = bookmarks, context_id) do
+    contexts_list = bookmarks.contexts |> Enum.filter(fn context -> context.id != context_id end)
+
+    bookmarks
+    |> Ecto.Changeset.change()
+    |> Changeset.put_change(:contexts, contexts_list)
+    |> Repo.update!()
+
   end
 
   @doc """

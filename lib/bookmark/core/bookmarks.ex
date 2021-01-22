@@ -45,6 +45,6 @@ defmodule Bookmark.Core.Bookmarks do
   def changeset_updated_context(bookmarks, context) do
     bookmarks
     |> cast(%{}, [:name, :url])
-    |> put_assoc(:contexts, context)
+    |> put_assoc(:contexts, [context | bookmarks.contexts])
   end
 end

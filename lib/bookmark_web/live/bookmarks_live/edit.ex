@@ -19,4 +19,12 @@ defmodule BookmarkWeb.BookmarksLive.Edit do
     |> assign(:bookmarks, Core.get_bookmarks_with_context!(id))
   end
 
+  @impl true
+  def handle_event("delete-context", %{"id" => context_id}, socket) do
+
+    updated_bookmark =
+      socket.assigns.bookmarks |> Core.delete_context_from_bookmark(String.to_integer(context_id))
+
+    {:noreply, assign(socket, :bookmarks, updated_bookmark)}
+  end
 end
