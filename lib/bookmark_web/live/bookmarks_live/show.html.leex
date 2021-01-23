@@ -15,16 +15,22 @@
         <%= for context <- @contexts do %>
           <div class="flex flex-col">
             <h3>Text: <%= context.text %></h3>
-            <div class="video">
-              <h3>Video</h3>
-              <video width="320" height="240" preload="auto" controls>
-                <source src="<%= context.video %>" type="video/mp4">
-                Your browser does not support the video tag.
-              </video>
-            </div>
-            <div class="picture">
-              <h3>Picture</h3>
-              <img src="<%= context.picture %>" alt="Context Image"/>
+            <div class="media">
+              <h3>Media</h3>
+              <%= for url <- context.picture do %>
+                <% ext = url |> String.split(".") |> List.last() %>
+                <%= if ext == "mp4" do %>
+                  <div class="video">
+                    <h3>Video</h3>
+                    <video width="320" height="240" preload="auto" controls>
+                      <source src="<%= url %>" type="video/mp4">
+                      Your browser does not support the video tag.
+                    </video>
+                  </div>
+                <% else %>
+                  <img src="<%= url %>" alt="Context Image" width="200" class="mb-2" />
+                <% end %>
+              <% end %>
             </div>
           </div>
         <% end %>

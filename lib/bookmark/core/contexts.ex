@@ -5,7 +5,7 @@ defmodule Bookmark.Core.Contexts do
   alias Bookmark.Core.{Bookmarks, BookmarkContexts}
 
   schema "contexts" do
-    field :picture, :string
+    field :picture, {:array, :string}, default: []
     field :text, :string
     field :video, :string
     many_to_many(
@@ -21,6 +21,6 @@ defmodule Bookmark.Core.Contexts do
   def changeset(context, attrs) do
     context
     |> cast(attrs, [:text, :video, :picture])
-    |> validate_required([:text, :video, :picture])
+    |> validate_required([:text])
   end
 end

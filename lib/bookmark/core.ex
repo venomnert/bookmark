@@ -84,7 +84,7 @@ defmodule Bookmark.Core do
       {:error, %Ecto.Changeset{}}
 
   """
-  def create_bookmarks(%{"context_id" => context_id} = attrs, :bookmark_selected_context) do
+  def create_bookmarks(%{"context_id" => context_id} = attrs, :bookmark_selected_context, _) do
     selected_context = __MODULE__.get_context!(context_id)
 
     %Bookmarks{}
@@ -105,7 +105,10 @@ defmodule Bookmark.Core do
       {:error, %Ecto.Changeset{}}
 
   """
-  def create_bookmarks(attrs, :bookmark_custom_context) do
+  def create_bookmarks(attrs, :bookmark_custom_context, {photo_urls, _}) do
+    attrs =
+      attrs |> put_in(["contexts", "0", "picture"], photo_urls) |> IO.inspect(label: "CALLED")
+
     %Bookmarks{}
     |> Bookmarks.changeset(attrs)
     |> Ecto.Changeset.cast_assoc(:contexts, with: &__MODULE__.change_context/2)
@@ -124,7 +127,7 @@ defmodule Bookmark.Core do
       {:error, %Ecto.Changeset{}}
 
   """
-  def create_bookmarks(attrs, :bookmark) do
+  def create_bookmarks(attrs, :bookmark, _) do
     %Bookmarks{}
     |> Bookmarks.changeset(attrs)
     |> Repo.insert()
@@ -249,7 +252,6 @@ defmodule Bookmark.Core do
     |> Ecto.Changeset.change()
     |> Changeset.put_change(:contexts, contexts_list)
     |> Repo.update!()
-
   end
 
   @doc """

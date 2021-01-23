@@ -5,6 +5,8 @@ defmodule BookmarkWeb.BookmarksLive.FormComponent do
   alias Bookmark.Core.{Contexts}
   alias Ecto
 
+  @upload_remove_event ["remove-video", "remove-photo"]
+
   # Testing form component - custom context
   @impl true
   def update(
@@ -87,6 +89,11 @@ defmodule BookmarkWeb.BookmarksLive.FormComponent do
   def update(%{bookmarks: bookmarks, action: :new} = assigns, socket) do
     bookmark_changeset = Core.change_bookmarks(bookmarks)
 
+    socket =
+      socket
+      |> allow_upload(:photo, accept: ~w(.png .jpeg .jpg .wav .mp4 .mpg .wmv .avi), max_entries: 5, max_file_size: 100_000_000)
+      |> allow_upload(:video, accept: ~w(.wav .mp4 .mpg .wmv .avi), max_entries: 1)
+
     {:ok,
      socket
      |> assign(assigns)
@@ -100,6 +107,11 @@ defmodule BookmarkWeb.BookmarksLive.FormComponent do
     bookmarks_changeset = Core.change_bookmarks(bookmarks)
     contexts_list = Core.list_contexts()
     new_context_changeset = Core.change_context(%Contexts{})
+
+    socket =
+      socket
+      |> allow_upload(:photo, accept: ~w(.png .jpeg .jpg), max_entries: 3)
+      |> allow_upload(:video, accept: ~w(.wav .mp4 .mpg .wmv .avi), max_entries: 1)
 
     {:ok,
      socket
@@ -183,6 +195,12 @@ defmodule BookmarkWeb.BookmarksLive.FormComponent do
   end
 
   @impl true
+  def handle_event(event, %{"ref" => ref}, socket) when event in @upload_remove_event do
+    upload_type = event |> String.split("-") |> List.last() |> String.to_atom()
+    {:noreply, cancel_upload(socket, upload_type, ref)}
+  end
+
+  @impl true
   def handle_event(
         "validate",
         %{"bookmarks" => bookmarks_params},
@@ -239,6 +257,14 @@ defmodule BookmarkWeb.BookmarksLive.FormComponent do
     end
   end
 
+  @impl true
+  def handle_event("delete-context", %{"id" => context_id}, socket) do
+    updated_bookmark =
+      socket.assigns.bookmarks |> Core.delete_context_from_bookmark(String.to_integer(context_id))
+
+    {:noreply, assign(socket, :bookmarks, updated_bookmark)}
+  end
+
   def handle_event(
         "save",
         %{"bookmarks" => %{"context_id" => context_id} = bookmarks_params},
@@ -251,10 +277,15 @@ defmodule BookmarkWeb.BookmarksLive.FormComponent do
   end
 
   def handle_event("save", %{"bookmarks" => bookmarks_params}, socket) do
+    IO.inspect(label: "PHOTOS")
     save_bookmarks(socket, socket.assigns.action, bookmarks_params)
   end
 
-  def handle_event("add-context", %{"contexts" => %{"context_id" => context_id} = contexts_params}, socket) do
+  def handle_event(
+        "add-context",
+        %{"contexts" => %{"context_id" => context_id} = contexts_params},
+        socket
+      ) do
     contexts_params = contexts_params |> Map.put("context_id", normalize_context_id(context_id))
     add_context(socket, socket.assigns.action, contexts_params)
   end
@@ -292,10 +323,14 @@ defmodule BookmarkWeb.BookmarksLive.FormComponent do
   end
 
   defp save_bookmarks(socket, :new, bookmarks_params) do
+    urls = put_media(socket) |> IO.inspect(label: "RESULTS")
+
     {type, updated_bookmarks_params} = check_bookmarks_params(bookmarks_params)
 
-    case Core.create_bookmarks(updated_bookmarks_params, type) do
-      {:ok, _bookmarks} ->
+    case Core.create_bookmarks(updated_bookmarks_params, type, urls) do
+      {:ok, bookmarks} ->
+        consume_media(socket, bookmarks)
+
         {:noreply,
          socket
          |> put_flash(:info, "Bookmarks created successfully")
@@ -306,17 +341,20 @@ defmodule BookmarkWeb.BookmarksLive.FormComponent do
     end
   end
 
-  defp save_bookmarks(socket, :edit, bookmarks_params) do
-    case Core.update_bookmarks(socket.assigns.bookmarks, bookmarks_params, :edit) do
-      {:ok, _bookmarks} ->
-        {:noreply,
-         socket
-         |> put_flash(:info, "Bookmarks updated successfully")
-         |> push_redirect(to: socket.assigns.return_to)}
+  defp consume_media(socket, bookmarks) do
+    consume_uploaded_entries(socket, :photo, fn meta, entry ->
+      dest = Path.join("priv/static/uploads", "#{entry.uuid}.#{ext(entry)}")
+      File.cp!(meta.path, dest)
+      IO.inspect(label: "LOADED PHOTOS")
+    end)
 
-      {:error, %Ecto.Changeset{} = changeset} ->
-        {:noreply, assign(socket, :changeset, changeset)}
-    end
+    consume_uploaded_entries(socket, :video, fn meta, entry ->
+      dest = Path.join("priv/static/uploads", "#{entry.uuid}.#{ext(entry)}")
+      File.cp!(meta.path, dest)
+      IO.inspect(label: "LOADED VIDEO")
+    end)
+
+    {:ok, bookmarks}
   end
 
   defp add_context(socket, :edit, contexts_params) do
@@ -330,6 +368,28 @@ defmodule BookmarkWeb.BookmarksLive.FormComponent do
       {:error, %Ecto.Changeset{} = changeset} ->
         {:noreply, assign(socket, :changeset, changeset)}
     end
+  end
+
+  defp put_media(socket) do
+    {photo_completed, []} = uploaded_entries(socket, :photo)
+    # {video_completed, []} = uploaded_entries(socket, :video) |> IO.inspect(label: "VIDEO")
+
+    photo_urls =
+      for entry <- photo_completed do
+        Routes.static_path(socket, "/uploads/#{entry.uuid}.#{ext(entry)}")
+      end
+
+    # video_urls =
+    #   for entry <- video_completed do
+    #     Routes.static_path(socket, "/uploads/#{entry.uuid}.#{ext(entry)}")
+    #   end
+
+    {photo_urls, %{}}
+  end
+
+  defp ext(entry) do
+    [ext | _] = MIME.extensions(entry.client_type)
+    ext
   end
 
   defp validate_bookmark_changeset(%{assigns: %{action: :new}} = socket, %{
