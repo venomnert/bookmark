@@ -79,8 +79,12 @@ defmodule BookmarkWeb.ContextsLive.FormComponent do
   end
 
   defp save_context(socket, :new, context_params) do
-    case Core.create_context(context_params) do
+    urls = put_media(socket)
+
+    case Core.create_context(context_params, urls) do
       {:ok, _context} ->
+        consume_media(socket)
+
         {:noreply,
          socket
          |> put_flash(:info, "Context created successfully")

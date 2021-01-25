@@ -349,6 +349,26 @@ defmodule Bookmark.Core do
       {:error, %Ecto.Changeset{}}
 
   """
+  def create_context(attrs, urls) do
+    attrs = attrs |> Map.put("media", urls)
+
+    %Contexts{}
+    |> Contexts.changeset(attrs)
+    |> Repo.insert()
+  end
+
+  @doc """
+  Creates a context.
+
+  ## Examples
+
+      iex> create_context(%{field: value})
+      {:ok, %Contexts{}}
+
+      iex> create_context(%{field: bad_value})
+      {:error, %Ecto.Changeset{}}
+
+  """
   def create_context(attrs \\ %{}) do
     %Contexts{}
     |> Contexts.changeset(attrs)
