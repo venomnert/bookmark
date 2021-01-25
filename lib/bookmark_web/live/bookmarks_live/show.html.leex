@@ -13,11 +13,13 @@
         <h2>No Contexts</h2>
       <% else %>
         <%= for context <- @contexts do %>
-          <div class="flex flex-col">
-            <h3>Text: <%= context.text %></h3>
+          <div class="flex flex-col mb-3">
+            <h3>Title: <%= context.title %></h3>
+            <h3>Text: </h3>
+            <p><%= context.text %></p>
             <div class="media">
               <h3>Media</h3>
-              <%= for url <- context.picture do %>
+              <%= for url <- context.media do %>
                 <% ext = url |> String.split(".") |> List.last() %>
                 <%= if ext == "mp4" do %>
                   <div class="video">
