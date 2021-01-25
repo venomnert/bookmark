@@ -3,9 +3,9 @@ defmodule Bookmark.Repo.Migrations.CreateContexts do
 
   def change do
     create table(:contexts) do
-      add :text, :string
-      add :video, :string
-      add :picture, :string
+      add :title, :string
+      add :text, :text
+      add :media, {:array, :string}, null: false, default: []
 
       timestamps()
     end
