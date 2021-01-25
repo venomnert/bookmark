@@ -105,9 +105,8 @@ defmodule Bookmark.Core do
       {:error, %Ecto.Changeset{}}
 
   """
-  def create_bookmarks(attrs, :bookmark_custom_context, {photo_urls, _}) do
-    attrs =
-      attrs |> put_in(["contexts", "0", "picture"], photo_urls) |> IO.inspect(label: "CALLED")
+  def create_bookmarks(attrs, :bookmark_custom_context, media_urls) do
+    attrs = attrs |> put_in(["contexts", "0", "media"], media_urls)
 
     %Bookmarks{}
     |> Bookmarks.changeset(attrs)
@@ -218,7 +217,9 @@ defmodule Bookmark.Core do
       {:error, %Ecto.Changeset{}}
 
   """
-  def add_context(%Bookmarks{} = bookmarks, %{"context_id" => context_id} = attrs) do
+  def add_context(%Bookmarks{} = bookmarks, %{"context_id" => context_id} = attrs, media_urls) do
+    attrs = attrs |> put_in(["media"], media_urls)
+
     context_id
     |> case do
       nil ->
