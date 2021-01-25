@@ -1,22 +1,29 @@
 <h1>Show Context</h1>
 
-<%= if @live_action in [:edit] do %>
-  <%= live_modal_context @socket, BookmarkWeb.ContextsLive.FormComponent,
-    id: @context.id,
-    title: @page_title,
-    action: @live_action,
-    context: @context,
-    return_to: Routes.contexts_show_path(@socket, :show, @context) %>
-<% end %>
-
 <div class="bg-white shadow-xl rounded-lg py-3">
   <div class="p-2">
-    <h3 class="text-center text-xl text-gray-900 font-medium leading-8"><%= @context.text %></h3>
-    <video width="320" height="240" preload="auto" controls>
-      <source src="<%= @context.video %>" type="video/mp4">
-      Your browser does not support the video tag.
-    </video>
-    <img class="block hover:text-indigo-600 hover:underline text-center text-indigo-500" src="<%= @context.picture %>" alt="Image of Context"/>
+    <div class="flex flex-col mb-3">
+      <h3>Title: <%= @context.title %></h3>
+      <h3>Text: </h3>
+      <p><%= @context.text %></p>
+      <div class="media">
+        <h3>Media</h3>
+        <%= for url <- @context.media do %>
+          <% ext = url |> String.split(".") |> List.last() %>
+          <%= if ext == "mp4" do %>
+            <div class="video">
+              <h3>Video</h3>
+              <video width="320" height="240" preload="auto" controls>
+                <source src="<%= url %>" type="video/mp4">
+                Your browser does not support the video tag.
+              </video>
+            </div>
+          <% else %>
+            <img src="<%= url %>" alt="Context Image" width="200" class="mb-2" />
+          <% end %>
+        <% end %>
+      </div>
+    </div>
 
     <div class="text-center my-3">
       <span><%= live_patch "Edit", to: Routes.contexts_edit_path(@socket, :edit, @context), class: "text-indigo-500 italic hover:underline hover:text-indigo-600 font-medium" %></span>

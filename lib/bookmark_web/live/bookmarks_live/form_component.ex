@@ -157,8 +157,6 @@ defmodule BookmarkWeb.BookmarksLive.FormComponent do
          socket
          |> assign(:changeset, bookmark_changeset)}
     end
-
-    # TODO - when select is selected remove context changeset
   end
 
   @impl true

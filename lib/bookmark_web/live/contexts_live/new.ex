@@ -6,7 +6,7 @@ defmodule BookmarkWeb.ContextsLive.New do
 
   @impl true
   def mount(_params, _session, socket) do
-    updated_socket =  assign(socket, :context, list_contexts())
+    updated_socket = assign(socket, :context, list_contexts())
 
     {:ok, updated_socket}
   end
@@ -16,13 +16,15 @@ defmodule BookmarkWeb.ContextsLive.New do
     {:noreply, apply_action(socket, socket.assigns.live_action, params)}
   end
 
-  defp apply_action(socket, :edit, %{"id" => id}) do
-    socket
-    |> assign(:page_title, "Edit Contexts")
-    |> assign(:contexts, Core.get_context!(id))
-  end
-
   defp apply_action(socket, :new, _params) do
+    socket =
+      socket
+      |> allow_upload(:media,
+        accept: ~w(.png .jpeg .jpg .wav .mp4 .mpg .wmv .avi),
+        max_entries: 5,
+        max_file_size: 100_000_000
+      )
+
     socket
     |> assign(:page_title, "New Contexts")
     |> assign(:contexts, %Contexts{})
@@ -30,7 +32,6 @@ defmodule BookmarkWeb.ContextsLive.New do
 
   @impl true
   def handle_event("delete", %{"id" => id}, socket) do
-
     context = Core.get_context!(id)
     {:ok, _} = Core.delete_context(context)
 

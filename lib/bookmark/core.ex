@@ -367,9 +367,12 @@ defmodule Bookmark.Core do
       {:error, %Ecto.Changeset{}}
 
   """
-  def update_context(%Contexts{} = context, attrs) do
+  def update_context(%Contexts{} = context, attrs, urls) do
+    attrs = attrs |> Map.put("media", urls)
+
     context
     |> Contexts.changeset(attrs)
+    |> IO.inspect(label: "LIST")
     |> Repo.update()
   end
 

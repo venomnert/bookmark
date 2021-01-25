@@ -31,9 +31,7 @@
       <thead>
           <tr>
               <th class="px-6 py-3 border-b-2 border-gray-300 text-left leading-4 text-blue-500 tracking-wider">Date Created</th>
-              <th class="px-6 py-3 border-b-2 border-gray-300 text-left text-sm leading-4 text-blue-500 tracking-wider">Text</th>
-              <th class="px-6 py-3 border-b-2 border-gray-300 text-left text-sm leading-4 text-blue-500 tracking-wider">Video</th>
-              <th class="px-6 py-3 border-b-2 border-gray-300 text-left text-sm leading-4 text-blue-500 tracking-wider">Picture</th>
+              <th class="px-6 py-3 border-b-2 border-gray-300 text-left text-sm leading-4 text-blue-500 tracking-wider">Title</th>
               <th class="px-6 py-3 border-b-2 border-gray-300"></th>
           </tr>
       </thead>
@@ -47,9 +45,7 @@
                 </div>
               </div>
             </td>
-            <td class="px-6 py-4 whitespace-no-wrap border-b text-blue-900 border-gray-500 text-sm leading-5"><%= context.text %></td>
-            <td class="px-6 py-4 whitespace-no-wrap border-b text-blue-900 border-gray-500 text-sm leading-5"><%= context.video %></td>
-            <td class="px-6 py-4 whitespace-no-wrap border-b text-blue-900 border-gray-500 text-sm leading-5"><%= context.picture %></td>
+            <td class="px-6 py-4 whitespace-no-wrap border-b text-blue-900 border-gray-500 text-sm leading-5"><%= context.title %></td>
             <td>
               <span><%= live_redirect "Show", to: Routes.contexts_show_path(@socket, :show, context) %></span>
               <span><%= live_patch "Edit", to: Routes.contexts_edit_path(@socket, :edit, context) %></span>
